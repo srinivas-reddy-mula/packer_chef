@@ -1,31 +1,54 @@
 {
   "variables": {
-    "myaccess": "",
-    "mysecret": ""
+    "subscription_id": " ", 
+	  "tenant_id": " ",
+    "client_id": " ",
+	  "client_secret": " "
   },
   "builders": [
     {
-      "type": "amazon-ebs",
-      "access_key": "{{user `myaccess`}}",
-      "secret_key": "{{user `mysecret`}}",
-      "region": "us-west-2",
-      "source_ami": "ami-08692d171e3cf02d6",
-      "instance_type": "t2.micro",
-      "ssh_username": "ubuntu",
-      "ami_name": "packer {{timestamp}}"
+      "type": "azure-arm",
+      "subscription_id" : "{{user `subscription`}}",
+      "tenant_id": "{{user `tenant`}}",
+      "client_id": "{{user `client`}}",
+      "client_secret": "{{user `secret`}}",
+      "location": "Central US",
+      "vm_size": "Standard_B1s",
+      "os_type": "Linux",
+      "image_publisher": "Canonical",
+      "image_offer": "UbuntuServer",
+      "image_sku": "16.04-LTS",
+      "managed_image_name": "jenkins_maven",
+      "managed_image_resource_group_name": "jenkins_maven",
+      "azure_tags": {
+        "jenkins": "maven",
+        "task": "Image deployment"
+      }
     }
   ],
   "provisioners": [
     {
+      "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo -E sh '{{ .Path }}'",
       "type": "shell",
       "inline": 
-      ["sudo apt-get update","pwd"]
-    },
-    {
-      "type": "chef-solo",
-      "version": "14.11.21",
-      "cookbook_paths": ["D:/DevOps_Practice/chef-starter/chef-repo/cookbooks"],
-      "run_list": ["recipe[apache_cookbook::default]"]
+      ["sudo apt-get update",
+        "sudo apt install maven -y",
+        "sudo apt install openjdk-8-jdk -y",
+        "wget https://www-us.apache.org/dist/maven/maven-3/3.6.0/binaries/apache-maven-3.6.0-bin.tar.gz -P /tmp",
+        "sudo tar xf /tmp/apache-maven-*.tar.gz -C /opt",
+        "sudo ln -s /opt/apache-maven-3.6.0 /opt/maven",
+        {
+          "type": "file",
+          "source": "./maven.sh",
+          "destination": "/etc/profile.d/maven.sh"
+        },
+        "sudo chmod +x /etc/profile.d/maven.sh",
+        "source /etc/profile.d/maven.sh",
+        "/usr/sbin/waagent -force -deprovision+user && export HISTSIZE=0 && sync",
+        
+      ],
+        "inline_shebang": "/bin/sh -x"
+
     }
-  ]
+    ]
 }

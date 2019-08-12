@@ -1,4 +1,6 @@
 {
-    "myaccess": "AKIARQP3LJPCKHRGI47O",
-    "mysecret": "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"
+  "subscription": "74bac108-8609-443d-9199-f3e0c241d5b9", 
+  "client": "9fd061cb-1036-405e-9439-24fae1ba0d7b",
+  "secret": "c3e17295-e590-4a94-b56b-484d80f6e8b3",
+  "tenant": "5dad39d8-f56c-48a7-aae4-45e2ed98778e"
   }
